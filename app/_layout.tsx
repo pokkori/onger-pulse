@@ -5,6 +5,7 @@ import { View, StyleSheet } from "react-native";
 import { usePlayerStore } from "../src/stores/playerStore";
 import { useSettingsStore } from "../src/stores/settingsStore";
 import { COLORS } from "../src/constants/colors";
+import { scheduleDailyReminder } from "../src/lib/notifications";
 
 export default function RootLayout() {
   const loadPlayer = usePlayerStore((s) => s.load);
@@ -13,6 +14,7 @@ export default function RootLayout() {
   useEffect(() => {
     loadPlayer();
     loadSettings();
+    scheduleDailyReminder().catch(() => {});
   }, [loadPlayer, loadSettings]);
 
   return (
