@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 import Animated, {
@@ -11,10 +11,17 @@ import Animated, {
 } from "react-native-reanimated";
 import { COLORS } from "../src/constants/colors";
 import { useGameStore } from "../src/stores/gameStore";
+import { updateStreak, getStreak } from "../src/lib/streak";
 
 export default function TitleScreen() {
   const router = useRouter();
   const currentSongId = useGameStore((s) => s.currentSongId);
+  const [streak, setStreak] = useState(0);
+
+  useEffect(() => {
+    // タイトル画面表示時にストリーク更新
+    updateStreak().then(setStreak).catch(() => getStreak().then(setStreak).catch(() => {}));
+  }, []);
 
   // Logo pulse animation (BPM 120 = 500ms per beat)
   const logoScale = useSharedValue(1);
@@ -95,6 +102,9 @@ export default function TitleScreen() {
             })
           }
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="ゲームをプレイする"
+          accessibilityHint="選択中の曲でゲームを開始します"
         >
           <Text style={styles.playText}>{"\u25B6"}  PLAY</Text>
         </TouchableOpacity>
@@ -103,21 +113,34 @@ export default function TitleScreen() {
           style={styles.outlineButton}
           onPress={() => router.push("/select")}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="曲を選択する"
         >
-          <Text style={styles.outlineText}>{"\u{1F3B5}"}  SELECT</Text>
+          <Text style={styles.outlineText}>SELECT</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.outlineButton}
           onPress={() => router.push("/shop")}
           activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel="ショップを開く"
         >
-          <Text style={styles.outlineText}>{"\u{1F6D2}"}  SHOP</Text>
+          <Text style={styles.outlineText}>SHOP</Text>
         </TouchableOpacity>
       </View>
 
       {/* Bottom bar */}
       <View style={styles.bottomBar}>
+        {streak > 0 && (
+          <View
+            style={styles.streakBadge}
+            accessibilityRole="text"
+            accessibilityLabel={`連続プレイ${streak}日`}
+          >
+            <Text style={styles.streakText}>{streak}日連続</Text>
+          </View>
+        )}
         <Text style={styles.versionText}>v1.0.0</Text>
       </View>
     </View>
@@ -228,5 +251,19 @@ const styles = StyleSheet.create({
   versionText: {
     color: COLORS.textMuted,
     fontSize: 12,
+  },
+  streakBadge: {
+    backgroundColor: 'rgba(255,200,0,0.15)',
+    borderRadius: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255,200,0,0.4)',
+    marginBottom: 4,
+  },
+  streakText: {
+    color: '#FFD93D',
+    fontSize: 12,
+    fontWeight: '700',
   },
 });

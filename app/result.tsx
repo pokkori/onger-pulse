@@ -131,15 +131,19 @@ export default function ResultScreen() {
               params: { songId },
             })
           }
+          accessibilityRole="button"
+          accessibilityLabel="もう一度プレイする"
         >
-          <Text style={styles.retryText}>{"\u{1F504}"} RETRY</Text>
+          <Text style={styles.retryText}>RETRY</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.titleButton}
           onPress={() => router.replace("/")}
+          accessibilityRole="button"
+          accessibilityLabel="タイトル画面に戻る"
         >
-          <Text style={styles.titleText}>{"\u{1F3E0}"} TITLE</Text>
+          <Text style={styles.titleText}>TITLE</Text>
         </TouchableOpacity>
       </View>
     </View>
