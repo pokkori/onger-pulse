@@ -1,5 +1,6 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import { getDailyBPM } from './dailyChallenge';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -34,6 +35,36 @@ export async function scheduleDailyReminder(): Promise<void> {
       sound: true,
     },
     trigger: { type: Notifications.SchedulableTriggerInputTypes.CALENDAR, hour: 20, minute: 0, repeats: true },
+  });
+
+  // デイリーチャレンジリマインダーは scheduleDailyChallengeNotification で別途設定
+}
+
+/**
+ * デイリーBPMチャレンジ更新通知（毎日20:00）
+ * 今日のBPMをメッセージに含める
+ */
+export async function scheduleDailyChallengeNotification(): Promise<void> {
+  if (Platform.OS === 'web') return;
+  const granted = await requestNotificationPermissions();
+  if (!granted) return;
+
+  const bpm = getDailyBPM();
+
+  // 既存のデイリーチャレンジ通知は cancelAllScheduledNotificationsAsync で管理されるため
+  // scheduleDailyReminder と同時に呼ばない場合は単独でスケジュール
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: '音撃パルス',
+      body: `今日のBPM${bpm}チャレンジが更新されました!`,
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.CALENDAR,
+      hour: 20,
+      minute: 0,
+      repeats: true,
+    },
   });
 }
 

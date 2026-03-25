@@ -7,20 +7,26 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming,
+  withSpring,
   Easing,
 } from "react-native-reanimated";
 import { COLORS } from "../src/constants/colors";
 import { useGameStore } from "../src/stores/gameStore";
 import { updateStreak, getStreak } from "../src/lib/streak";
+import { getDailyBPM, getTodayChallenge } from "../src/lib/dailyChallenge";
 
 export default function TitleScreen() {
   const router = useRouter();
   const currentSongId = useGameStore((s) => s.currentSongId);
   const [streak, setStreak] = useState(0);
+  const [dailyCompleted, setDailyCompleted] = useState(false);
+  const todayBPM = getDailyBPM();
 
   useEffect(() => {
     // タイトル画面表示時にストリーク更新
     updateStreak().then(setStreak).catch(() => getStreak().then(setStreak).catch(() => {}));
+    // デイリーチャレンジ完了状態を確認
+    getTodayChallenge().then((result) => setDailyCompleted(result !== null)).catch(() => {});
   }, []);
 
   // Logo pulse animation (BPM 120 = 500ms per beat)
@@ -75,6 +81,20 @@ export default function TitleScreen() {
     opacity: ringOpacity.value,
   }));
 
+  // Daily banner pop-in
+  const bannerScale = useSharedValue(0.9);
+  const bannerOpacity = useSharedValue(0);
+
+  useEffect(() => {
+    bannerScale.value = withSpring(1, { damping: 10, stiffness: 200 });
+    bannerOpacity.value = withTiming(1, { duration: 400 });
+  }, [bannerScale, bannerOpacity]);
+
+  const bannerAnimStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: bannerScale.value }],
+    opacity: bannerOpacity.value,
+  }));
+
   return (
     <View style={styles.container}>
       {/* Logo area */}
@@ -90,6 +110,38 @@ export default function TitleScreen() {
         <Animated.View style={[styles.ring, ringAnimStyle]} />
         <Animated.View style={[styles.ringInner, ringAnimStyle]} />
       </View>
+
+      {/* Daily Challenge Banner */}
+      <Animated.View style={[styles.dailyBannerWrapper, bannerAnimStyle]}>
+        <TouchableOpacity
+          style={[
+            styles.dailyBanner,
+            dailyCompleted && styles.dailyBannerCompleted,
+          ]}
+          onPress={() => router.push('/daily')}
+          activeOpacity={0.8}
+          accessibilityRole="button"
+          accessibilityLabel={`デイリーチャレンジ、今日のBPM${todayBPM}`}
+          accessibilityHint="デイリーチャレンジ画面に移動します"
+        >
+          <View style={styles.dailyBannerLeft}>
+            <Text style={styles.dailyBannerLabel}>DAILY CHALLENGE</Text>
+            <Text style={styles.dailyBannerBPM}>BPM {todayBPM}</Text>
+          </View>
+          {dailyCompleted ? (
+            <View style={styles.completedBadge}>
+              <View style={styles.checkShort} />
+              <View style={styles.checkLong} />
+              <Text style={styles.completedBadgeText}>完了</Text>
+            </View>
+          ) : (
+            <View style={styles.dailyArrow}>
+              <View style={[styles.arrowLine, { backgroundColor: '#FFD93D' }]} />
+              <View style={[styles.arrowHead, { borderLeftColor: '#FFD93D', borderBottomColor: '#FFD93D' }]} />
+            </View>
+          )}
+        </TouchableOpacity>
+      </Animated.View>
 
       {/* Buttons */}
       <View style={styles.buttons}>
@@ -181,7 +233,7 @@ const styles = StyleSheet.create({
     height: 160,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 24,
   },
   ring: {
     position: "absolute",
@@ -206,6 +258,100 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
+  },
+  dailyBannerWrapper: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  dailyBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 60,
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: 'rgba(255,217,61,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,217,61,0.3)',
+  },
+  dailyBannerCompleted: {
+    backgroundColor: 'rgba(45,212,191,0.06)',
+    borderColor: 'rgba(45,212,191,0.3)',
+  },
+  dailyBannerLeft: {
+    gap: 2,
+  },
+  dailyBannerLabel: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    fontWeight: '700',
+    letterSpacing: 3,
+  },
+  dailyBannerBPM: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#FFD93D',
+    letterSpacing: 1,
+  },
+  completedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(45,212,191,0.15)',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(45,212,191,0.4)',
+  },
+  checkShort: {
+    position: 'absolute',
+    width: 2,
+    height: 6,
+    backgroundColor: '#2DD4BF',
+    borderRadius: 1,
+    left: 8,
+    top: 10,
+    transform: [{ rotate: '45deg' }],
+  },
+  checkLong: {
+    position: 'absolute',
+    width: 2,
+    height: 10,
+    backgroundColor: '#2DD4BF',
+    borderRadius: 1,
+    right: 26,
+    top: 4,
+    transform: [{ rotate: '-45deg' }],
+  },
+  completedBadgeText: {
+    color: '#2DD4BF',
+    fontSize: 13,
+    fontWeight: '700',
+    marginLeft: 18,
+  },
+  dailyArrow: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  arrowLine: {
+    position: 'absolute',
+    width: 16,
+    height: 2,
+    borderRadius: 1,
+    right: 6,
+  },
+  arrowHead: {
+    position: 'absolute',
+    right: 6,
+    width: 8,
+    height: 8,
+    borderLeftWidth: 2,
+    borderBottomWidth: 2,
+    transform: [{ rotate: '-135deg' }],
   },
   buttons: {
     width: "100%",

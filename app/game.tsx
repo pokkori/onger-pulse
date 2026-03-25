@@ -15,6 +15,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useGameStore } from "../src/stores/gameStore";
 import { usePlayerStore } from "../src/stores/playerStore";
+import { saveDailyChallengeResult } from "../src/lib/dailyChallenge";
 import { useGameLoop } from "../src/hooks/useGameLoop";
 import { useHaptics } from "../src/hooks/useHaptics";
 import { GameEngine } from "../src/engine/GameEngine";
@@ -37,8 +38,9 @@ import { formatScore } from "../src/utils/format";
 
 export default function GameScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ songId: string }>();
+  const params = useLocalSearchParams<{ songId: string; isDaily?: string }>();
   const songId = params.songId || "neon-rush";
+  const isDaily = params.isDaily === '1';
 
   const beatmap = getBeatmapById(songId);
   const engineRef = useRef<GameEngine | null>(null);
@@ -320,6 +322,11 @@ export default function GameScreen() {
       }
 
       playerStore.save();
+
+      // デイリーチャレンジとして起動された場合はスコアを保存
+      if (isDaily) {
+        saveDailyChallengeResult(state.score).catch(() => {});
+      }
 
       // Navigate after short delay
       const timer = setTimeout(() => {
