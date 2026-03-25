@@ -38,7 +38,13 @@ export default function SelectScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="戻る"
+          accessibilityHint="前の画面に戻ります"
+          style={{ minHeight: 44, justifyContent: 'center' }}
+        >
           <Text style={styles.backButton}>{"\u2190"} BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>SELECT SONG</Text>
@@ -63,6 +69,9 @@ export default function SelectScreen() {
               }}
               disabled={!unlocked}
               activeOpacity={0.8}
+              accessibilityRole="radio"
+              accessibilityLabel={`${bm.title}、BPM ${bm.bpm}、${bm.difficultyLabel}${unlocked ? '' : '、ロック中'}`}
+              accessibilityState={{ selected: isSelected, disabled: !unlocked }}
             >
               <Card
                 selected={isSelected}
@@ -139,6 +148,10 @@ export default function SelectScreen() {
           style={styles.startButton}
           onPress={handleStart}
           disabled={!unlockedSongs.includes(selectedId)}
+          accessibilityRole="button"
+          accessibilityLabel="選択した曲でゲームを開始する"
+          accessibilityHint="ゲーム画面に移動します"
+          accessibilityState={{ disabled: !unlockedSongs.includes(selectedId) }}
         >
           <Text style={styles.startText}>
             {"\u25B6"}  START

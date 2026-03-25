@@ -406,6 +406,9 @@ export default function GameScreen() {
             setShowPauseModal(true);
             triggerButton();
           }}
+          accessibilityRole="button"
+          accessibilityLabel="一時停止"
+          accessibilityHint="ゲームを一時停止します"
         >
           <Text style={styles.pauseIcon}>{"\u23F8"}</Text>
         </TouchableOpacity>
@@ -461,9 +464,10 @@ export default function GameScreen() {
               setShowPauseModal(false);
               setPhase("playing");
             }}
+            accessibilityLabel="ゲームを再開する"
           />
           <Button
-            title={"\u{1F504} RETRY"}
+            title={"RETRY"}
             variant="outline"
             onPress={() => {
               setShowPauseModal(false);
@@ -472,14 +476,16 @@ export default function GameScreen() {
                 params: { songId },
               });
             }}
+            accessibilityLabel="最初からやり直す"
           />
           <Button
-            title={"\u{1F3E0} QUIT"}
+            title={"QUIT"}
             variant="outline"
             onPress={() => {
               setShowPauseModal(false);
               router.replace("/");
             }}
+            accessibilityLabel="タイトルに戻る"
           />
         </View>
       </Modal>

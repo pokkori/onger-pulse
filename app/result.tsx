@@ -69,7 +69,11 @@ export default function ResultScreen() {
       </Text>
 
       {/* Stats card */}
-      <View style={styles.statsCard}>
+      <View
+        style={styles.statsCard}
+        accessibilityRole="summary"
+        accessibilityLabel={`スコア ${formatScore(finalScore)}、最大コンボ ${maxCombo}、ランク ${rank}`}
+      >
         <StatRow label="SCORE" value={formatScore(displayScore)} />
         <StatRow label="MAX COMBO" value={String(maxCombo)} />
         <StatRow

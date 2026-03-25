@@ -75,7 +75,13 @@ export default function ShopScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
+        <TouchableOpacity
+          onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="戻る"
+          accessibilityHint="前の画面に戻ります"
+          style={{ minHeight: 44, justifyContent: 'center' }}
+        >
           <Text style={styles.backButton}>{"\u2190"} BACK</Text>
         </TouchableOpacity>
         <Text style={styles.title}>SHOP</Text>
@@ -90,7 +96,13 @@ export default function ShopScreen() {
         <Text style={styles.sectionTitle}>Song Packs</Text>
         <View style={styles.grid}>
           {PRODUCTS.filter((p) => p.id.includes("song")).map((product) => (
-            <TouchableOpacity key={product.id} style={styles.gridItem}>
+            <TouchableOpacity
+              key={product.id}
+              style={styles.gridItem}
+              accessibilityRole="button"
+              accessibilityLabel={`${product.name}を購入する、${product.displayPrice}`}
+              accessibilityHint="タップして購入画面に進みます"
+            >
               <Card>
                 <Text style={styles.productIcon}>
                   {"\u{1F3B5}"}
@@ -109,7 +121,13 @@ export default function ShopScreen() {
         <Text style={styles.sectionTitle}>Effect Skins</Text>
         <View style={styles.grid}>
           {PRODUCTS.filter((p) => p.id.includes("skin")).map((product) => (
-            <TouchableOpacity key={product.id} style={styles.gridItem}>
+            <TouchableOpacity
+              key={product.id}
+              style={styles.gridItem}
+              accessibilityRole="button"
+              accessibilityLabel={`${product.name}スキンを購入する、${product.displayPrice}`}
+              accessibilityHint="タップして購入画面に進みます"
+            >
               <Card>
                 <Text style={styles.productIcon}>
                   {product.name === "Fire"
@@ -133,7 +151,13 @@ export default function ShopScreen() {
           (p) =>
             p.id === "bp_remove_ads" || p.id === "bp_season_pass"
         ).map((product) => (
-          <TouchableOpacity key={product.id}>
+          <TouchableOpacity
+            key={product.id}
+            style={{ minHeight: 44 }}
+            accessibilityRole="button"
+            accessibilityLabel={`${product.name}を購入する、${product.displayPrice}`}
+            accessibilityHint="タップして購入画面に進みます"
+          >
             <Card style={styles.premiumCard}>
               <View style={styles.premiumRow}>
                 <View>
@@ -156,7 +180,12 @@ export default function ShopScreen() {
         ))}
 
         {/* Restore */}
-        <TouchableOpacity style={styles.restoreButton}>
+        <TouchableOpacity
+          style={styles.restoreButton}
+          accessibilityRole="button"
+          accessibilityLabel="購入を復元する"
+          accessibilityHint="過去の購入履歴を復元します"
+        >
           <Text style={styles.restoreText}>Restore Purchases</Text>
         </TouchableOpacity>
       </ScrollView>

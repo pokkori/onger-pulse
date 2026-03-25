@@ -25,8 +25,15 @@ export function Modal({ visible, onClose, children }: ModalProps) {
         style={styles.overlay}
         activeOpacity={1}
         onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="モーダルを閉じる"
+        accessibilityHint="背景をタップしてモーダルを閉じます"
       >
-        <TouchableOpacity activeOpacity={1} style={styles.content}>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={styles.content}
+          accessibilityViewIsModal
+        >
           {children}
         </TouchableOpacity>
       </TouchableOpacity>

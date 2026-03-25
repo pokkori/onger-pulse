@@ -1,3 +1,4 @@
+import React from 'react';
 import { ScrollView, Text, View, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -12,10 +13,12 @@ export default function LegalScreen() {
           onPress={() => router.back()}
           accessibilityLabel="戻る"
           accessibilityRole="button"
+          accessibilityHint="前の画面に戻ります"
         >
-          <Text style={styles.backText}>← 戻る</Text>
+          <Text style={styles.backText}>{'<'} 戻る</Text>
         </Pressable>
-        <Text style={styles.title}>特定商取引法に基づく表記</Text>
+
+        <Text style={styles.title} accessibilityRole="header">特定商取引法に基づく表記</Text>
         <View style={styles.table}>
           {[
             ['販売事業者', '個人運営'],
@@ -31,12 +34,29 @@ export default function LegalScreen() {
           ))}
         </View>
 
-        <Text style={[styles.title, { marginTop: 32 }]}>プライバシーポリシー</Text>
-        <Text style={styles.body}>
-          本アプリ「音撃パルス」はユーザーのプライバシーを尊重します。{'\n\n'}
-          ゲームの進行データは端末内のみに保存されます。広告配信のためAdMob（Google社）のSDKを使用しています。
-          収集した情報を第三者に販売することはありません。
-        </Text>
+        <Text style={styles.sectionTitle}>関連ページ</Text>
+
+        <Pressable
+          style={styles.linkButton}
+          onPress={() => router.push('/legal/privacy')}
+          accessibilityRole="link"
+          accessibilityLabel="プライバシーポリシーを見る"
+          accessibilityHint="プライバシーポリシーページに移動します"
+        >
+          <Text style={styles.linkText}>プライバシーポリシー</Text>
+          <Text style={styles.linkArrow}>{'>'}</Text>
+        </Pressable>
+
+        <Pressable
+          style={styles.linkButton}
+          onPress={() => router.push('/legal/terms')}
+          accessibilityRole="link"
+          accessibilityLabel="利用規約を見る"
+          accessibilityHint="利用規約ページに移動します"
+        >
+          <Text style={styles.linkText}>利用規約</Text>
+          <Text style={styles.linkArrow}>{'>'}</Text>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -52,5 +72,20 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.1)', paddingBottom: 12 },
   key: { color: '#9CA3AF', width: 120, fontSize: 14 },
   val: { color: '#fff', flex: 1, fontSize: 14 },
-  body: { color: '#D1D5DB', fontSize: 14, lineHeight: 22 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: '#9CA3AF', marginTop: 32, marginBottom: 12 },
+  linkButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    minHeight: 52,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+    marginBottom: 10,
+  },
+  linkText: { color: '#60A5FA', fontSize: 15, fontWeight: '600' },
+  linkArrow: { color: '#9CA3AF', fontSize: 16 },
 });
