@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
+// Pressable replaces Pressable per design standard 2026
 import { useRouter } from "expo-router";
 import Animated, {
   useSharedValue,
@@ -9,11 +10,14 @@ import Animated, {
   withTiming,
   withSpring,
   Easing,
+  FadeInDown,
 } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "../src/constants/colors";
 import { useGameStore } from "../src/stores/gameStore";
 import { updateStreak, getStreak } from "../src/lib/streak";
 import { getDailyBPM, getTodayChallenge } from "../src/lib/dailyChallenge";
+import WelcomeBackModal, { checkWelcomeBack } from "../src/components/WelcomeBackModal";
 
 export default function TitleScreen() {
   const router = useRouter();
@@ -21,12 +25,16 @@ export default function TitleScreen() {
   const [streak, setStreak] = useState(0);
   const [dailyCompleted, setDailyCompleted] = useState(false);
   const todayBPM = getDailyBPM();
+  const [welcomeVisible, setWelcomeVisible] = useState(false);
+  const [welcomeResult, setWelcomeResult] = useState<{ shouldShow: boolean; hoursAway: number; bonusCoins: number; message: string }>({ shouldShow: false, hoursAway: 0, bonusCoins: 0, message: '' });
 
   useEffect(() => {
     // タイトル画面表示時にストリーク更新
     updateStreak().then(setStreak).catch(() => getStreak().then(setStreak).catch(() => {}));
     // デイリーチャレンジ完了状態を確認
     getTodayChallenge().then((result) => setDailyCompleted(result !== null)).catch(() => {});
+    // 復帰モーダルチェック
+    checkWelcomeBack().then((r) => { if (r.shouldShow) { setWelcomeResult(r); setWelcomeVisible(true); } });
   }, []);
 
   // Logo pulse animation (BPM 120 = 500ms per beat)
@@ -96,7 +104,7 @@ export default function TitleScreen() {
   }));
 
   return (
-    <View style={styles.container}>
+    <LinearGradient colors={['#0F0F1A', '#1A0A2E', '#2D1B4E']} style={styles.container}>
       {/* Logo area */}
       <View style={styles.logoArea}>
         <Animated.View style={logoAnimStyle}>
@@ -113,13 +121,13 @@ export default function TitleScreen() {
 
       {/* Daily Challenge Banner */}
       <Animated.View style={[styles.dailyBannerWrapper, bannerAnimStyle]}>
-        <TouchableOpacity
+        <Pressable
           style={[
             styles.dailyBanner,
             dailyCompleted && styles.dailyBannerCompleted,
           ]}
           onPress={() => router.push('/daily')}
-          activeOpacity={0.8}
+
           accessibilityRole="button"
           accessibilityLabel={`デイリーチャレンジ、今日のBPM${todayBPM}`}
           accessibilityHint="デイリーチャレンジ画面に移動します"
@@ -140,12 +148,12 @@ export default function TitleScreen() {
               <View style={[styles.arrowHead, { borderLeftColor: '#FFD93D', borderBottomColor: '#FFD93D' }]} />
             </View>
           )}
-        </TouchableOpacity>
+        </Pressable>
       </Animated.View>
 
       {/* Buttons */}
       <View style={styles.buttons}>
-        <TouchableOpacity
+        <Pressable
           style={styles.playButton}
           onPress={() =>
             router.push({
@@ -153,33 +161,33 @@ export default function TitleScreen() {
               params: { songId: currentSongId },
             })
           }
-          activeOpacity={0.8}
+
           accessibilityRole="button"
           accessibilityLabel="ゲームをプレイする"
           accessibilityHint="選択中の曲でゲームを開始します"
         >
           <Text style={styles.playText}>{"\u25B6"}  PLAY</Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           style={styles.outlineButton}
           onPress={() => router.push("/select")}
-          activeOpacity={0.8}
+
           accessibilityRole="button"
           accessibilityLabel="曲を選択する"
         >
           <Text style={styles.outlineText}>SELECT</Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           style={styles.outlineButton}
           onPress={() => router.push("/shop")}
-          activeOpacity={0.8}
+
           accessibilityRole="button"
           accessibilityLabel="ショップを開く"
         >
           <Text style={styles.outlineText}>SHOP</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Bottom bar */}
@@ -195,7 +203,12 @@ export default function TitleScreen() {
         )}
         <Text style={styles.versionText}>v1.0.0</Text>
       </View>
-    </View>
+      <WelcomeBackModal
+        visible={welcomeVisible}
+        result={welcomeResult}
+        onClose={() => setWelcomeVisible(false)}
+      />
+    </LinearGradient>
   );
 }
 

@@ -1,9 +1,11 @@
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -38,7 +40,7 @@ export default function SelectScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
           accessibilityLabel="戻る"
@@ -46,7 +48,7 @@ export default function SelectScreen() {
           style={{ minHeight: 44, justifyContent: 'center' }}
         >
           <Text style={styles.backButton}>{"\u2190"} BACK</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.title}>SELECT SONG</Text>
         <View style={{ width: 60 }} />
       </View>
@@ -62,23 +64,19 @@ export default function SelectScreen() {
           const isSelected = selectedId === bm.id;
 
           return (
-            <TouchableOpacity
+            <Pressable
               key={bm.id}
               onPress={() => {
                 if (unlocked) setSelectedId(bm.id);
               }}
               disabled={!unlocked}
-              activeOpacity={0.8}
               accessibilityRole="radio"
               accessibilityLabel={`${bm.title}、BPM ${bm.bpm}、${bm.difficultyLabel}${unlocked ? '' : '、ロック中'}`}
               accessibilityState={{ selected: isSelected, disabled: !unlocked }}
             >
               <Card
                 selected={isSelected}
-                style={[
-                  styles.songCard,
-                  !unlocked && styles.lockedCard,
-                ]}
+                style={!unlocked ? { ...styles.songCard, ...styles.lockedCard } : styles.songCard}
               >
                 <View style={styles.songHeader}>
                   <Text style={styles.songTitle}>
@@ -137,14 +135,14 @@ export default function SelectScreen() {
                   </View>
                 )}
               </Card>
-            </TouchableOpacity>
+            </Pressable>
           );
         })}
       </ScrollView>
 
       {/* Start button */}
       <View style={styles.footer}>
-        <TouchableOpacity
+        <Pressable
           style={styles.startButton}
           onPress={handleStart}
           disabled={!unlockedSongs.includes(selectedId)}
@@ -156,7 +154,7 @@ export default function SelectScreen() {
           <Text style={styles.startText}>
             {"\u25B6"}  START
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );

@@ -11,4 +11,11 @@ export const CONFIG = {
   REPLAY_BUFFER_FRAMES: 900,
   SKILL_CHOICE_COUNT: 3,
   MAX_ENEMIES_ON_SCREEN: 20,
+
+  /** 初回30秒セーフティネット: progress < この値の間はライフ減少なし */
+  SAFETY_NET_PROGRESS: 0.15,
+  /** セーフティネット中のミス時のライフ減少量 (0 = 減らない) */
+  SAFETY_NET_LIFE_PENALTY: 0,
+  /** 変動報酬: スターエネミーの金色グロー色 */
+  STAR_ENEMY_GLOW_COLOR: '#FFD700',
 } as const;

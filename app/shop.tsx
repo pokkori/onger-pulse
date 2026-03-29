@@ -1,9 +1,11 @@
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -75,7 +77,7 @@ export default function ShopScreen() {
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
+        <Pressable
           onPress={() => router.back()}
           accessibilityRole="button"
           accessibilityLabel="戻る"
@@ -83,7 +85,7 @@ export default function ShopScreen() {
           style={{ minHeight: 44, justifyContent: 'center' }}
         >
           <Text style={styles.backButton}>{"\u2190"} BACK</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.title}>SHOP</Text>
         <View style={{ width: 60 }} />
       </View>
@@ -96,7 +98,7 @@ export default function ShopScreen() {
         <Text style={styles.sectionTitle}>Song Packs</Text>
         <View style={styles.grid}>
           {PRODUCTS.filter((p) => p.id.includes("song")).map((product) => (
-            <TouchableOpacity
+            <Pressable
               key={product.id}
               style={styles.gridItem}
               accessibilityRole="button"
@@ -113,7 +115,7 @@ export default function ShopScreen() {
                   {product.displayPrice}
                 </Text>
               </Card>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
 
@@ -121,7 +123,7 @@ export default function ShopScreen() {
         <Text style={styles.sectionTitle}>Effect Skins</Text>
         <View style={styles.grid}>
           {PRODUCTS.filter((p) => p.id.includes("skin")).map((product) => (
-            <TouchableOpacity
+            <Pressable
               key={product.id}
               style={styles.gridItem}
               accessibilityRole="button"
@@ -141,7 +143,7 @@ export default function ShopScreen() {
                   {product.displayPrice}
                 </Text>
               </Card>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
 
@@ -151,7 +153,7 @@ export default function ShopScreen() {
           (p) =>
             p.id === "bp_remove_ads" || p.id === "bp_season_pass"
         ).map((product) => (
-          <TouchableOpacity
+          <Pressable
             key={product.id}
             style={{ minHeight: 44 }}
             accessibilityRole="button"
@@ -176,18 +178,18 @@ export default function ShopScreen() {
                 </Text>
               </View>
             </Card>
-          </TouchableOpacity>
+          </Pressable>
         ))}
 
         {/* Restore */}
-        <TouchableOpacity
+        <Pressable
           style={styles.restoreButton}
           accessibilityRole="button"
           accessibilityLabel="購入を復元する"
           accessibilityHint="過去の購入履歴を復元します"
         >
           <Text style={styles.restoreText}>Restore Purchases</Text>
-        </TouchableOpacity>
+        </Pressable>
       </ScrollView>
     </View>
   );

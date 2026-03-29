@@ -15,7 +15,7 @@ export default function PrivacyPage() {
           accessibilityLabel="戻る"
           accessibilityHint="前の画面に戻ります"
         >
-          <Text style={styles.backText}>{'<'} 戻る</Text>
+          <Text style={styles.backText}>{'← 戻る'}</Text>
         </Pressable>
 
         <View style={styles.content}>
@@ -29,8 +29,7 @@ export default function PrivacyPage() {
 
           <Text style={styles.section}>2. 使用する第三者サービス</Text>
           <Text style={styles.body}>
-            {'- expo-notifications: ローカルプッシュ通知（外部送信なし）\n'}
-            {'- expo-av: 音楽再生（デバイス内処理のみ）\n'}
+            {'- expo-audio: 音楽再生（デバイス内処理のみ）\n'}
             {'- expo-haptics: 触覚フィードバック（デバイス内処理のみ）\n'}
             {'- Expo SDK: アプリフレームワーク\n'}
             {'- AdMob (Google LLC): 広告配信のため使用。収集データはGoogleのプライバシーポリシーに準じます。'}
@@ -54,7 +53,7 @@ export default function PrivacyPage() {
           </Text>
 
           <Text style={styles.section}>6. お問い合わせ</Text>
-          <Text style={styles.body}>support@example.com</Text>
+          <Text style={styles.body}>support@ongeki-pulse.app</Text>
 
           <Text style={styles.updated}>最終更新: 2025年12月1日</Text>
         </View>

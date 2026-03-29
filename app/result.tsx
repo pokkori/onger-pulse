@@ -1,10 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState, useCallback } from "react";
+import { View, Text, StyleSheet, Pressable, Share, Linking } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { COLORS } from "../src/constants/colors";
 import { formatScore, formatPercent, getRank } from "../src/utils/format";
 import { ScoreCard } from "../src/components/share/ScoreCard";
 import { getBeatmapById } from "../src/data/beatmaps";
+import { usePlayerStore } from "../src/stores/playerStore";
+import NearMissBanner from "../src/components/NearMissBanner";
+import { useRewardedAd } from "../src/hooks/useRewardedAd";
 
 export default function ResultScreen() {
   const router = useRouter();
@@ -36,6 +41,25 @@ export default function ResultScreen() {
   const rank = getRank(perfectRate);
 
   const beatmap = getBeatmapById(songId);
+  const bestScoreData = usePlayerStore((s) => s.bestScores[songId]);
+  const bestScore = bestScoreData?.score ?? 0;
+  const { isLoaded: adLoaded, showAd } = useRewardedAd();
+
+  const handleShare = useCallback(async () => {
+    const msg = `音撃パルス「${beatmap?.title ?? songId}」- ${formatScore(finalScore)}pts ランク${rank} #音撃パルス`;
+    try { await Share.share({ message: msg }); } catch (_) {}
+  }, [finalScore, rank, beatmap, songId]);
+
+  const handleShareX = useCallback(async () => {
+    const msg = encodeURIComponent(`音撃パルス「${beatmap?.title ?? songId}」- ${formatScore(finalScore)}pts ランク${rank} #音撃パルス`);
+    await Linking.openURL(`https://twitter.com/intent/tweet?text=${msg}`);
+  }, [finalScore, rank, beatmap, songId]);
+
+  const handleWatchAd = useCallback(() => {
+    showAd(() => {
+      // Reward: extra play or coins
+    });
+  }, [showAd]);
 
   // Count-up animation
   const [displayScore, setDisplayScore] = useState(0);
@@ -125,9 +149,26 @@ export default function ResultScreen() {
         </View>
       </View>
 
+      <NearMissBanner score={finalScore} highScore={bestScore} />
+
+      {/* Share & Ad */}
+      <View style={styles.shareRow}>
+        <Pressable style={styles.shareBtn} onPress={handleShare} accessibilityRole="button" accessibilityLabel="スコアをシェアする">
+          <Text style={styles.shareBtnText}>シェア</Text>
+        </Pressable>
+        <Pressable style={styles.xBtn} onPress={handleShareX} accessibilityRole="button" accessibilityLabel="Xに投稿する">
+          <Text style={styles.xBtnText}>Xに投稿</Text>
+        </Pressable>
+        {adLoaded && (
+          <Pressable style={styles.adBtn} onPress={handleWatchAd} accessibilityRole="button" accessibilityLabel="広告を見てボーナスを獲得する">
+            <Text style={styles.adBtnText}>広告でボーナス</Text>
+          </Pressable>
+        )}
+      </View>
+
       {/* Action buttons */}
       <View style={styles.actions}>
-        <TouchableOpacity
+        <Pressable
           style={styles.retryButton}
           onPress={() =>
             router.replace({
@@ -139,16 +180,16 @@ export default function ResultScreen() {
           accessibilityLabel="もう一度プレイする"
         >
           <Text style={styles.retryText}>RETRY</Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity
+        <Pressable
           style={styles.titleButton}
           onPress={() => router.replace("/")}
           accessibilityRole="button"
           accessibilityLabel="タイトル画面に戻る"
         >
           <Text style={styles.titleText}>TITLE</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -289,4 +330,11 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     letterSpacing: 2,
   },
+  shareRow: { flexDirection: "row", justifyContent: "center", gap: 8, marginTop: 16 },
+  shareBtn: { backgroundColor: COLORS.primary, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, minHeight: 44, justifyContent: "center" },
+  shareBtnText: { color: "#FFF", fontSize: 13, fontWeight: "700" },
+  xBtn: { backgroundColor: "#000", paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, minHeight: 44, justifyContent: "center", borderWidth: 1, borderColor: "#333" },
+  xBtnText: { color: "#FFF", fontSize: 13, fontWeight: "700" },
+  adBtn: { backgroundColor: "#FFB300", paddingHorizontal: 16, paddingVertical: 10, borderRadius: 20, minHeight: 44, justifyContent: "center" },
+  adBtnText: { color: "#1A1A2E", fontSize: 13, fontWeight: "700" },
 });

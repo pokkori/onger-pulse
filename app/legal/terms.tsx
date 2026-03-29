@@ -64,6 +64,16 @@ export default function TermsPage() {
             本規約は日本法に基づき解釈されます。
           </Text>
 
+          <Text style={styles.section}>第8条（仮想通貨の有効期限）</Text>
+          <Text style={styles.body}>
+            本アプリ内で取得したコイン・ジェム等の仮想通貨は、取得日から180日間有効です。有効期限を過ぎた仮想通貨は自動的に失効し、返金はいたしません。
+          </Text>
+
+          <Text style={styles.section}>第9条（未成年者の利用）</Text>
+          <Text style={styles.body}>
+            未成年者が本アプリを利用する場合は、保護者の同意を得た上でご利用ください。未成年者による課金は、保護者の同意があるものとみなします。15歳以下の月額課金上限は5,000円、16〜17歳は10,000円を推奨します。
+          </Text>
+
           <Text style={styles.updated}>最終更新: 2025年12月1日</Text>
         </View>
       </ScrollView>

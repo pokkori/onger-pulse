@@ -1,9 +1,10 @@
+import { LinearGradient } from "expo-linear-gradient";
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   Share,
   Platform,
@@ -198,7 +199,7 @@ export default function DailyChallengeScreen() {
   return (
     <View style={styles.container}>
       {/* Back button */}
-      <TouchableOpacity
+      <Pressable
         style={styles.backButton}
         onPress={() => router.back()}
         accessibilityRole="button"
@@ -210,7 +211,7 @@ export default function DailyChallengeScreen() {
           <View style={[styles.backArrowHead, { borderRightColor: COLORS.textPrimary, borderBottomColor: COLORS.textPrimary }]} />
         </View>
         <Text style={styles.backText}>BACK</Text>
-      </TouchableOpacity>
+      </Pressable>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -253,10 +254,10 @@ export default function DailyChallengeScreen() {
               <Text style={styles.completedScoreLabel}>SCORE</Text>
 
               {/* Share button */}
-              <TouchableOpacity
+              <Pressable
                 style={styles.shareButton}
                 onPress={handleShare}
-                activeOpacity={0.8}
+
                 accessibilityRole="button"
                 accessibilityLabel="結果をXでシェアする"
                 accessibilityHint="スコアをXに投稿します"
@@ -266,20 +267,19 @@ export default function DailyChallengeScreen() {
                   <View style={[styles.xIconV, { backgroundColor: '#fff' }]} />
                 </View>
                 <Text style={styles.shareButtonText}>Xでシェア</Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : (
-            <TouchableOpacity
+            <Pressable
               style={styles.startButton}
               onPress={handleStart}
-              activeOpacity={0.8}
               accessibilityRole="button"
               accessibilityLabel="デイリーチャレンジを開始する"
               accessibilityHint={`BPM ${todayBPM}のチャレンジを開始します`}
             >
               <PulseIcon color="#1A1A2E" />
               <Text style={styles.startButtonText}>チャレンジ開始</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
         </Animated.View>
 

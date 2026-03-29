@@ -17,5 +17,7 @@ export async function mergeStorageValue<T extends object>(
   key: string,
   partial: Partial<T>
 ): Promise<void> {
-  await AsyncStorage.mergeItem(key, JSON.stringify(partial));
+  const raw = await AsyncStorage.getItem(key);
+  const existing = raw ? JSON.parse(raw) : {};
+  await AsyncStorage.setItem(key, JSON.stringify({ ...existing, ...partial }));
 }

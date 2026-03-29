@@ -3,8 +3,9 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   GestureResponderEvent,
+  Dimensions,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import Animated, {
@@ -35,6 +36,10 @@ import { Modal } from "../src/components/ui/Modal";
 import { Button } from "../src/components/ui/Button";
 import { JUDGMENT_COMBO_CONTINUES } from "../src/types/judgment";
 import { formatScore } from "../src/utils/format";
+import { useJuice, JuiceProvider, ComboCounter } from "../src/components/vfx";
+import { useProceduralAudio } from "../src/hooks/useProceduralAudio";
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function GameScreen() {
   const router = useRouter();
@@ -81,6 +86,10 @@ export default function GameScreen() {
 
   const { triggerJudgment, triggerButton } = useHaptics();
 
+  // VFX v2.0 Juice + Procedural Audio
+  const juice = useJuice();
+  const audio = useProceduralAudio();
+
   const [countdownNum, setCountdownNum] = useState<number | null>(null);
   const [showPauseModal, setShowPauseModal] = useState(false);
   const [judgmentKey, setJudgmentKey] = useState(0);
@@ -101,6 +110,7 @@ export default function GameScreen() {
     reset();
     setCurrentSong(songId);
     setTotalNotes(beatmap.notes.length);
+    audio.startBGM();
 
     const engine = new GameEngine(beatmap);
     engineRef.current = engine;
@@ -143,6 +153,7 @@ export default function GameScreen() {
 
     return () => {
       clearInterval(interval);
+      audio.stopBGM(500);
     };
   }, [songId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -241,12 +252,17 @@ export default function GameScreen() {
       if (JUDGMENT_COMBO_CONTINUES[result.judgment]) {
         const prevCombo = state.combo;
         incrementCombo();
+
+        // VFX + SE on success
+        audio.playSE('success');
+        juice.onCorrect(prevCombo + 1, result.score, { x: locationX, y: locationY });
+
         const milestone = ComboManager.checkMilestone(
           prevCombo,
           prevCombo + 1
         );
         if (milestone) {
-          // Combo milestone reached - could play SE here
+          audio.playSE('combo', { comboCount: prevCombo + 1 });
         }
 
         // Damage enemy
@@ -270,14 +286,25 @@ export default function GameScreen() {
       } else {
         resetCombo();
         takeDamage();
+        // VFX + SE on miss
+        audio.playSE('fail');
+        juice.onWrong();
       }
     },
     [phase, beatmap] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
-  // Navigate to result when game ends
+  // Navigate to result when game ends + VFX
   useEffect(() => {
     if (phase === "cleared" || phase === "failed") {
+      audio.stopBGM(1000);
+      if (phase === "cleared") {
+        audio.playSE('new_record');
+        juice.onNewRecord({ x: SCREEN_WIDTH / 2, y: SCREEN_HEIGHT / 2 });
+      } else {
+        audio.playSE('gameover');
+        juice.onGameOver();
+      }
       const state = useGameStore.getState();
       const totalJudged =
         state.perfectCount +
@@ -362,6 +389,7 @@ export default function GameScreen() {
   const remainingMs = Math.max(0, beatmap.durationMs - elapsedMs);
 
   return (
+    <JuiceProvider juice={juice}>
     <View style={styles.container} onTouchStart={handleTap}>
       {/* Game canvas with enemies and pulse ring */}
       <GameCanvas
@@ -375,6 +403,7 @@ export default function GameScreen() {
         <ScoreDisplay score={score} />
         <LayerIndicator layers={layers} />
         <ComboDisplay combo={combo} multiplier={comboMultiplier} />
+        <ComboCounter combo={combo} style={styles.comboCounter} />
       </View>
 
       {/* Progress bar */}
@@ -399,7 +428,7 @@ export default function GameScreen() {
 
       {/* Pause button */}
       {phase === "playing" && (
-        <TouchableOpacity
+        <Pressable
           style={styles.pauseButton}
           onPress={() => {
             setPhase("paused");
@@ -411,7 +440,7 @@ export default function GameScreen() {
           accessibilityHint="ゲームを一時停止します"
         >
           <Text style={styles.pauseIcon}>{"\u23F8"}</Text>
-        </TouchableOpacity>
+        </Pressable>
       )}
 
       {/* Judgment effect */}
@@ -490,6 +519,7 @@ export default function GameScreen() {
         </View>
       </Modal>
     </View>
+    </JuiceProvider>
   );
 }
 
@@ -592,5 +622,11 @@ const styles = StyleSheet.create({
   pauseButtons: {
     gap: 12,
     width: 200,
+  },
+  comboCounter: {
+    position: "absolute",
+    top: 60,
+    alignSelf: "center",
+    zIndex: 50,
   },
 });
