@@ -1,22 +1,23 @@
 /**
- * proceduralAudio.ts -- 音撃パルス
+ * proceduralAudio.ts -- 色惑い
  * ---------------------------------------------------------------
  * Web Audio API によるプロシージャル BGM / SE 生成モジュール v2.0
  *
- * ジャンル: EDM / Future Bass
- * BPM: 138 (通常) / 158 (フィーバー)
- * キー: A (minor_penta)
+ * ジャンル: puzzle (Ambient Electronic)
+ * BPM: 88 (通常) / 108 (フィーバー)
+ * キー: Eb major (ペンタトニック)
  *
  * 特徴:
  * - 5声部 BGM (メロディ + サブメロディ + ベース + コードパッド + ドラム)
  * - フィーバー時: BPM+20, アルペジオ追加, フィルター解放, コンプ感UP
- * - 緊張モード: BPM+25, マイナー転調, 8分ドラム
- * - リバーブ (マルチタップディレイ)
+ * - 緊張モード: BPM+30, マイナー転調, 8分ドラム
+ * - リバーブ (ConvolverNode)
  * - 9種 SE (tap/success/fail/combo/gameover/levelup/fever_start/fever_end/new_record)
  * - コンボSE: 4段階音程上昇
  * - React Native ネイティブ環境では no-op フォールバック
  * ---------------------------------------------------------------
  */
+
 import { Platform } from 'react-native';
 
 // ================================================================
@@ -127,40 +128,40 @@ interface GamePreset {
 }
 
 const PRESET: GamePreset = {
-  bpm: 138,
+  bpm: 88,
   feverBpmAdd: 20,
-  tensionBpmAdd: 25,
-  rootNote: 'A',
-  scale: 'minor_penta',
-  feverScale: 'blues',
-  tensionScale: 'minor',
-  chordProgression: 'tension',
+  tensionBpmAdd: 30,
+  rootNote: 'Eb',
+  scale: 'major_penta',
+  feverScale: 'mixolydian',
+  tensionScale: 'minor_penta',
+  chordProgression: 'chill',
   melodyOctave: 5,
-  melodyWave: 'sawtooth',
-  melodyVolume: 0.10,
-  melodyNoteDensity: 0.8,
-  subMelodyWave: 'square',
+  melodyWave: 'sine',
+  melodyVolume: 0.12,
+  melodyNoteDensity: 0.6,
+  subMelodyWave: 'triangle',
   subMelodyOctave: 4,
   subMelodyVolume: 0.06,
-  bassWave: 'sawtooth',
-  bassOctave: 1,
-  bassVolume: 0.22,
-  bassStyle: 'staccato',
-  chordWave: 'sawtooth',
+  bassWave: 'sine',
+  bassOctave: 2,
+  bassVolume: 0.18,
+  bassStyle: 'sustained',
+  chordWave: 'sine',
   chordVolume: 0.05,
-  chordStyle: 'stab',
-  drumStyle: 'four_on_floor',
-  kickVolume: 0.16,
-  snareVolume: 0.10,
-  hihatVolume: 0.06,
-  clapVolume: 0.1,
-  reverbMix: 0.20,
-  filterCutoff: 5000,
-  feverArpWave: 'sawtooth',
-  feverArpVolume: 0.09,
-  bgmMasterVolume: 0.36,
+  chordStyle: 'pad',
+  drumStyle: 'ambient',
+  kickVolume: 0.10,
+  snareVolume: 0.05,
+  hihatVolume: 0.03,
+  clapVolume: 0.0,
+  reverbMix: 0.35,
+  filterCutoff: 2000,
+  feverArpWave: 'sine',
+  feverArpVolume: 0.07,
+  bgmMasterVolume: 0.35,
   seMasterVolume: 0.6,
-  swingAmount: 0.00,
+  swingAmount: 0.15,
 };
 
 // ================================================================
